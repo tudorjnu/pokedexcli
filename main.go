@@ -4,47 +4,20 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+
+	"github.com/tudorjnu/pokedexcli/internal/config"
+	"github.com/tudorjnu/pokedexcli/internal/repl"
 )
-
-func commandExit() error {
-	fmt.Fprintln(os.Stdout, "Closing the Pokedex... Goodbye!")
-	os.Exit(0)
-	return nil
-}
-
-type cliCommand struct {
-	name        string
-	description string
-	callback    func() error
-}
-
-func initMap(m map[string]cliCommand) {
-	m["exit"] = cliCommand{
-		name:        "exit",
-		description: "Exit the pokedex",
-		callback:    commandExit,
-	}
-
-	m["help"] = cliCommand{
-		name:        "help",
-		description: "Displays a help message",
-		callback: func() error {
-			fmt.Printf("Welcome to the Pokedex!\nUsage:\n\n")
-			for _, v := range m {
-				fmt.Printf("%s: %s\n", v.name, v.description)
-			}
-			return nil
-		},
-	}
-
-}
 
 func main() {
 	fmt.Printf("Your Program was initiated successfully!\n")
+	config := config.Config{
+		Previous: "",
+		Next:     "https://pokeapi.co/api/v2/location-area?offset=0&limit=20",
+	}
 	scanner := bufio.NewScanner(os.Stdin)
 
-	commandMap := make(map[string]cliCommand)
-	initMap(commandMap)
+	commandMap := repl.InitMap()
 
 	for {
 		fmt.Fprintf(os.Stdout, "Pokedex > ")
@@ -62,7 +35,7 @@ func main() {
 			continue
 		}
 
-		commandMap[command].callback()
+		commandMap[command].Callback(&config)
 
 		// fmt.Printf("Your command was: %v\n", cleanText[0])
 	}
