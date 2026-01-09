@@ -4,17 +4,28 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/tudorjnu/pokedexcli/internal/config"
+	"github.com/tudorjnu/pokedexcli/internal/pokeapi"
+	"github.com/tudorjnu/pokedexcli/internal/pokecache"
 	"github.com/tudorjnu/pokedexcli/internal/repl"
 )
 
 func main() {
 	fmt.Printf("Your Program was initiated successfully!\n")
+
+	duration, _ := time.ParseDuration("1s")
+
+	cache := pokecache.NewCache(duration)
+	pokeapi := pokeapi.NewPokeApi(cache)
+
 	config := config.Config{
 		Previous: "",
 		Next:     "https://pokeapi.co/api/v2/location-area?offset=0&limit=20",
+		PokeApi:  pokeapi,
 	}
+
 	scanner := bufio.NewScanner(os.Stdin)
 
 	commandMap := repl.InitMap()
@@ -36,8 +47,5 @@ func main() {
 		}
 
 		commandMap[command].Callback(&config)
-
-		// fmt.Printf("Your command was: %v\n", cleanText[0])
 	}
-
 }

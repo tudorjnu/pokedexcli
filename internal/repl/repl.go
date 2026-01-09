@@ -3,7 +3,6 @@ package repl
 import (
 	"fmt"
 	"github.com/tudorjnu/pokedexcli/internal/config"
-	"github.com/tudorjnu/pokedexcli/internal/pokedexapi"
 	"os"
 	"strings"
 )
@@ -76,7 +75,7 @@ func CommandMap(c *config.Config) error {
 		fmt.Printf("you're on the last page\n")
 	}
 
-	r, err := pokedexapi.GetLocationAreas(c.Next)
+	r, err := c.PokeApi.GetLocationAreas(c.Next)
 	if err != nil {
 		return err
 	}
@@ -105,7 +104,7 @@ func commandMapB(c *config.Config) error {
 		fmt.Printf("you're on the first page\n")
 	}
 
-	r, err := pokedexapi.GetLocationAreas(c.Previous)
+	r, err := c.PokeApi.GetLocationAreas(c.Previous)
 	if err != nil {
 		return err
 	}
