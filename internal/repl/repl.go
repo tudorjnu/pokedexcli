@@ -69,8 +69,6 @@ func InitMap() map[string]CliCommand {
 }
 
 func CommandMap(c *config.Config) error {
-	fmt.Println("You called the map command, wow!")
-
 	if c.Next == "" {
 		fmt.Printf("you're on the last page\n")
 	}
