@@ -5,11 +5,10 @@ import (
 	"time"
 )
 
-// TODO: add mutex
 type Cache struct {
 	cacheMap map[string]cacheEntry
 	interval time.Duration
-	mu       sync.Mutex
+	mu       sync.RWMutex
 }
 
 type cacheEntry struct {
@@ -31,13 +30,17 @@ func NewCache(interval time.Duration) Cache {
 
 func (c *Cache) Add(key string, val []byte) {
 	now := time.Now()
+	c.mu.Lock()
 	c.cacheMap[key] = cacheEntry{
 		createdAt: now,
 		val:       val,
 	}
+	c.mu.Unlock()
 }
 func (c *Cache) Get(key string) ([]byte, bool) {
+	c.mu.RLock()
 	v, ok := c.cacheMap[key]
+	c.mu.RUnlock()
 	if !ok {
 		return nil, false
 	}
@@ -51,11 +54,13 @@ func (c *Cache) reapLoop(interval time.Duration) {
 	for {
 		t, ok := <-ticker.C
 		if ok {
+			c.mu.Lock()
 			for k, v := range c.cacheMap {
 				if t.Sub(v.createdAt) > interval {
 					delete(c.cacheMap, k)
 				}
 			}
+			c.mu.Unlock()
 		}
 	}
 
