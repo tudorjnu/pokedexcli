@@ -38,12 +38,14 @@ func (c *Cache) Add(key string, val []byte) {
 	c.mu.Unlock()
 }
 func (c *Cache) Get(key string) ([]byte, bool) {
-	c.mu.RLock()
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	v, ok := c.cacheMap[key]
-	c.mu.RUnlock()
 	if !ok {
 		return nil, false
 	}
+	v.createdAt = time.Now()
 
 	return v.val, true
 }
