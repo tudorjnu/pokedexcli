@@ -15,7 +15,7 @@ import (
 func main() {
 	fmt.Printf("Your Program was initiated successfully!\n")
 
-	duration, _ := time.ParseDuration("1s")
+	duration, _ := time.ParseDuration("20s")
 
 	cache := pokecache.NewCache(duration)
 	pokeapi := pokeapi.NewPokeApi(cache)
