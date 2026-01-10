@@ -39,14 +39,26 @@ func main() {
 			fmt.Fprintln(os.Stderr, "shouldn't see an error scanning a string")
 		}
 
-		command := scanner.Text()
+		inputText := scanner.Text()
+		parsedInput := repl.CleanInput(inputText)
 
+		if parsedInput == nil {
+			fmt.Printf("Unknown command")
+			continue
+		}
+
+		command := parsedInput[0]
+		args := parsedInput[1:]
 		_, ok := commandMap[command]
 		if !ok {
 			fmt.Fprintln(os.Stdout, "Unknown command")
 			continue
 		}
 
-		commandMap[command].Callback(&config)
+		fmt.Println()
+		err := commandMap[command].Callback(&config, args)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 }
