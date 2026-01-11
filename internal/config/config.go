@@ -6,4 +6,5 @@ type Config struct {
 	Previous string
 	Next     string
 	PokeApi  pokeapi.PokeAPI
+	PokeDex  map[string]pokeapi.Pokemon
 }

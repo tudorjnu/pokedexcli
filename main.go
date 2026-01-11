@@ -19,12 +19,14 @@ func main() {
 	}
 
 	cache := pokecache.NewCache(duration)
-	pokeapi := pokeapi.NewPokeApi(cache)
+	api := pokeapi.NewPokeApi(cache)
+	pokedex := make(map[string]pokeapi.Pokemon)
 
 	config := config.Config{
 		Previous: "",
 		Next:     "https://pokeapi.co/api/v2/location-area?offset=0&limit=20",
-		PokeApi:  pokeapi,
+		PokeApi:  api,
+		PokeDex:  pokedex,
 	}
 
 	scanner := bufio.NewScanner(os.Stdin)

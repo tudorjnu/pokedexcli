@@ -57,8 +57,29 @@ func (papi *PokeAPI) GetLocationAreas(url string) (locationAreasResponse, error)
 }
 
 type Pokemon struct {
-	Name string `json:"name"`
-	URL  string `json:"url"`
+	Name           string `json:"name"`
+	URL            string `json:"url"`
+	BaseExperience int    `json:"base_experience"`
+	Height         int    `json:"height"`
+	Weight         int    `json:"weight"`
+	IsDefault      bool   `json:"is_default"`
+	Order          int    `json:"order"`
+	Abilities      []struct {
+		IsHidden bool `json:"is_hidden"`
+		Slot     int  `json:"slot"`
+		Ability  struct {
+			Name string `json:"name"`
+			URL  string `json:"url"`
+		} `json:"ability"`
+	} `json:"abilities"`
+	Stats []struct {
+		BaseStat int `json:"base_stat"`
+		Effort   int `json:"effort"`
+		Stat     struct {
+			Name string `json:"name"`
+			URL  string `json:"url"`
+		} `json:"stat"`
+	} `json:"stats"`
 }
 
 type locationAreasPokemonsResponse struct {
@@ -116,4 +137,77 @@ func (papi *PokeAPI) GetLocationAreaPokemons(url string) ([]Pokemon, error) {
 	}
 
 	return pokeList, nil
+}
+
+type pokemonResponse struct {
+	ID             int    `json:"id"`
+	Name           string `json:"name"`
+	BaseExperience int    `json:"base_experience"`
+	Height         int    `json:"height"`
+	Weight         int    `json:"weight"`
+	IsDefault      bool   `json:"is_default"`
+	Order          int    `json:"order"`
+	Abilities      []struct {
+		IsHidden bool `json:"is_hidden"`
+		Slot     int  `json:"slot"`
+		Ability  struct {
+			Name string `json:"name"`
+			URL  string `json:"url"`
+		} `json:"ability"`
+	} `json:"abilities"`
+	Stats []struct {
+		BaseStat int `json:"base_stat"`
+		Effort   int `json:"effort"`
+		Stat     struct {
+			Name string `json:"name"`
+			URL  string `json:"url"`
+		} `json:"stat"`
+	} `json:"stats"`
+}
+
+func (papi *PokeAPI) GetPokemon(pokemonString string) (Pokemon, error) {
+	url := "https://pokeapi.co/api/v2/pokemon/" + pokemonString
+	res, err := http.Get(url)
+	if err != nil {
+		return Pokemon{}, err
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+	var pokemon pokemonResponse
+	err = decoder.Decode(&pokemon)
+	if err != nil {
+		return Pokemon{}, err
+	}
+
+	return Pokemon{
+		Name:           pokemon.Name,
+		URL:            url,
+		BaseExperience: pokemon.BaseExperience,
+	}, nil
+}
+
+func (papi *PokeAPI) InspectPokemon(pokemonString string) (Pokemon, error) {
+	url := "https://pokeapi.co/api/v2/inspect/" + pokemonString
+	res, err := http.Get(url)
+	if err != nil {
+		return Pokemon{}, err
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+	var pokemon pokemonResponse
+	err = decoder.Decode(&pokemon)
+	if err != nil {
+		return Pokemon{}, err
+	}
+
+	return Pokemon{
+		Name:           pokemon.Name,
+		URL:            url,
+		BaseExperience: pokemon.BaseExperience,
+		Height:         pokemon.Height,
+		Weight:         pokemon.Weight,
+		Stats:          pokemon.Stats,
+	}, nil
 }
